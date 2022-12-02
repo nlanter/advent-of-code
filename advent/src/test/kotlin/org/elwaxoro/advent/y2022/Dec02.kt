@@ -10,13 +10,10 @@ class Dec02: PuzzleDayTester(2, 2022) {
 
         load().forEach {
             val (opp, me) = it.split(" ").let{ plays -> RPS.fromString(plays[0]) to RPS.fromString(plays[1])}
-            if (opp.beats(me)) {
-                opponentScore += winningScore
-            } else if (me.beats(opp)) {
-                myScore += winningScore
-            } else {
-                opponentScore += drawScore
-                myScore += drawScore
+            when {
+                opp.beats(me) -> opponentScore += winningScore
+                me.beats(opp) -> myScore += winningScore
+                else -> {opponentScore += drawScore; myScore += drawScore}
             }
 
             opponentScore += opp.playScore
@@ -56,19 +53,26 @@ class Dec02: PuzzleDayTester(2, 2022) {
         const val drawScore = 3
     }
 
-
     override fun part2(): Any {
         var myScore = 0
 
         load().forEach {
             val (opp, winLoseOrDraw) = it.split(" ").let{ plays -> RPSV2.fromString(plays[0]) to WinLoseOrDraw.fromString(plays[1])}
 
-            val score = winLoseOrDraw.getMyPlay(opp).playScore + winLoseOrDraw.playScore
-            println("enemy played $opp, i played ${winLoseOrDraw.getMyPlay(opp)} and $winLoseOrDraw with a score of $score")
+            val score = getMyPlay(winLoseOrDraw, opp).playScore + winLoseOrDraw.playScore
+            println("enemy played $opp, i played ${getMyPlay(winLoseOrDraw, opp)} and $winLoseOrDraw with a score of $score")
             myScore += score
         }
 
         return myScore
+    }
+
+    private fun getMyPlay(winLoseOrDraw: WinLoseOrDraw, rps: RPSV2): RPSV2 {
+        return when (winLoseOrDraw) {
+            WinLoseOrDraw.WIN -> rps.losesTo()
+            WinLoseOrDraw.LOSE -> rps.beats()
+            else -> rps
+        }
     }
 
     enum class RPSV2(private val opponentPlay: String, val playScore: Int) {
@@ -107,17 +111,9 @@ class Dec02: PuzzleDayTester(2, 2022) {
         DRAW("Y", 3),
         IGNORED("", 0);
 
-        fun getMyPlay(rps: RPSV2): RPSV2 {
-            return when {
-                this == WIN -> rps.losesTo()
-                this == LOSE -> rps.beats()
-                else -> rps
-            }
-        }
-
         companion object {
             fun fromString(str: String): WinLoseOrDraw {
-                return WinLoseOrDraw.values().firstOrNull { it.str == str } ?: WinLoseOrDraw.IGNORED
+                return WinLoseOrDraw.values().firstOrNull { it.str == str } ?: IGNORED
             }
         }
     }
