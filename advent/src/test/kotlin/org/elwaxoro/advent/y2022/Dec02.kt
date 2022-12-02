@@ -17,8 +17,7 @@ class Dec02 : PuzzleDayTester(2, 2022) {
      * Parse first to RPS, leave last alone, play as whatever RPS is appropriate for the desired outcome
      */
     override fun part2(): Any = load().map {
-        val split = it.split(" ")
-        split.first().parseRPS() to split.last()
+        it.split(" ").let { it.first().parseRPS() to it.last() }
     }.sumOf { (them, us) ->
         when (us) {
             "X" -> them.wins().play(them) // we need to lose
