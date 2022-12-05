@@ -2,8 +2,6 @@ package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.PuzzleDayTester
 import java.util.*
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 class Dec05 : PuzzleDayTester(5, 2022) {
     private val distanceBetweenLetters = 4
@@ -12,13 +10,10 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         val input = load()
         val stacks = getInitialState(input)
 
-        val indOfFirstMove = input.indexOf(input.first { it.contains("from") })
-
-        val moves: List<Move> = getMovesList(indOfFirstMove, input)
+        val moves: List<Move> = getMovesList(input)
 
         // move boxes
         moveBoxes(moves, stacks)
-
 
         //grab top from each stack
         var output = ""
@@ -39,8 +34,10 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         }
     }
 
-    private fun getMovesList(indOfFirstMove: Int, input: List<String>): List<Move> {
+    private fun getMovesList(input: List<String>): List<Move> {
+        val indOfFirstMove = input.indexOf(input.first { it.contains("from") })
         var moves: List<Move> = mutableListOf()
+        
         for (row in indOfFirstMove until input.size) {
             val reggy = "move (\\d{1,2}) from (\\d{1,2}) to (\\d{1,2})".toRegex()
             val matcher = reggy.matchEntire(input[row])
