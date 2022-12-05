@@ -31,7 +31,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         moves: List<Move>,
         stacks: MutableMap<Int, Stack<Char>>
     ) {
-        moves.forEachIndexed { ind, move: Move ->
+        moves.forEach { move: Move ->
             for (i in 0 until move.count) {
                 val popped = stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()
                 popped?.let { stacks[move.to]?.push(popped) }
