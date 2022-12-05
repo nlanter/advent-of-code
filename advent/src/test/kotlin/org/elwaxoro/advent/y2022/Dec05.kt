@@ -14,7 +14,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
      */
     override fun part1(): Any = loader().let { (stacks, moves) ->
         crateMover(stacks, moves, true)
-    }// == "FWSHSPJWM"
+    } == "FWSHSPJWM"
 
     /**
      * Wait this isn't a CrateMover 9000 it's a CrateMover 9001
@@ -22,15 +22,16 @@ class Dec05 : PuzzleDayTester(5, 2022) {
      */
     override fun part2(): Any = loader().let { (stacks, moves) ->
         crateMover(stacks, moves, false)
-    }// == "PWPWHGFZS"
+    } == "PWPWHGFZS"
 
-    private fun crateMover(stackMap: MutableMap<String, List<String>>, moves: List<List<String>>, isReversed: Boolean): String =
-        moves.fold(stackMap) { stacks, move ->
-            stacks[move[1]]!!.takeSplit(move[0].toInt()).let { (toMove, toKeep) ->
-                stacks[move[1]] = toKeep
-                stacks[move[2]] = (toMove.takeUnless { isReversed } ?: toMove.reversed()).plus(stacks[move[2]]!!)
+    private fun crateMover(stacks: MutableMap<String, List<String>>, moves: List<List<String>>, isReversed: Boolean): String =
+        stacks.also {
+            moves.forEach { move ->
+                stacks[move[1]]!!.takeSplit(move[0].toInt()).let { (toMove, toKeep) ->
+                    stacks[move[1]] = toKeep
+                    stacks[move[2]] = (toMove.takeUnless { isReversed } ?: toMove.reversed()).plus(stacks[move[2]]!!)
+                }
             }
-            stacks
         }.map { it.value.first() }.joinToString("")
 
     /**
@@ -65,11 +66,11 @@ class Dec05 : PuzzleDayTester(5, 2022) {
 //            val destStack = stacks[move[2]]!!
 //            val copyCount = move[0].toInt()
 //            var toMove = sourceStack.take(copyCount)
-//            if (isReversed) {
+//            if (isReversed) { // CrateMover 9001 drops crates in their original order
 //                toMove = toMove.reversed()
 //            }
 //            stacks[move[1]] = sourceStack.drop(copyCount)
-//            stacks[move[2]] = toMove.plus(destStack) // CrateMover 9001 drops crates in their original order
+//            stacks[move[2]] = toMove.plus(destStack)
 //        }
 //        return stacks.map { it.value.first() }.joinToString("")
 //    }
