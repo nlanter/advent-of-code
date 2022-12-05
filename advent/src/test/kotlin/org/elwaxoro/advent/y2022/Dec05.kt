@@ -2,6 +2,7 @@ package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.PuzzleDayTester
 import org.elwaxoro.advent.rowColSwap
+import org.elwaxoro.advent.takeSplit
 
 /**
  * Day 5: Supply Stacks
@@ -12,15 +13,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
      * Presumably, a CrateMover 9000
      */
     override fun part1(): Any = loader().let { (stacks, moves) ->
-        moves.forEach { move ->
-            val sourceStack = stacks[move[1]]!!
-            val destStack = stacks[move[2]]!!
-            val copyCount = move[0].toInt()
-            val toMove = sourceStack.take(copyCount)
-            stacks[move[1]] = sourceStack.drop(copyCount)
-            stacks[move[2]] = toMove.reversed().plus(destStack) // CrateMover 9000 drops crates in reverse order onto the new stack
-        }
-        stacks.map { it.value.first() }.joinToString("")
+        crateMover(stacks, moves, true)
     }// == "FWSHSPJWM"
 
     /**
@@ -28,16 +21,17 @@ class Dec05 : PuzzleDayTester(5, 2022) {
      * OH SHIT
      */
     override fun part2(): Any = loader().let { (stacks, moves) ->
-        moves.forEach { move ->
-            val sourceStack = stacks[move[1]]!!
-            val destStack = stacks[move[2]]!!
-            val copyCount = move[0].toInt()
-            val toMove = sourceStack.take(copyCount)
-            stacks[move[1]] = sourceStack.drop(copyCount)
-            stacks[move[2]] = toMove.plus(destStack) // CrateMover 9001 drops crates in their original order
-        }
-        stacks.map { it.value.first() }.joinToString("")
+        crateMover(stacks, moves, false)
     }// == "PWPWHGFZS"
+
+    private fun crateMover(stackMap: MutableMap<String, List<String>>, moves: List<List<String>>, isReversed: Boolean): String =
+        moves.fold(stackMap) { stacks, move ->
+            stacks[move[1]]!!.takeSplit(move[0].toInt()).let { (toMove, toKeep) ->
+                stacks[move[1]] = toKeep
+                stacks[move[2]] = (toMove.takeUnless { isReversed } ?: toMove.reversed()).plus(stacks[move[2]]!!)
+            }
+            stacks
+        }.map { it.value.first() }.joinToString("")
 
     /**
      * The award for most annoying parser goes to...
@@ -63,4 +57,20 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         }
         parsedStacks to parsedMoves
     }
+
+
+//    private fun crateMover(stacks: MutableMap<String, List<String>>, moves: List<List<String>>, isReversed: Boolean): String {
+//        moves.forEach { move ->
+//            val sourceStack = stacks[move[1]]!!
+//            val destStack = stacks[move[2]]!!
+//            val copyCount = move[0].toInt()
+//            var toMove = sourceStack.take(copyCount)
+//            if (isReversed) {
+//                toMove = toMove.reversed()
+//            }
+//            stacks[move[1]] = sourceStack.drop(copyCount)
+//            stacks[move[2]] = toMove.plus(destStack) // CrateMover 9001 drops crates in their original order
+//        }
+//        return stacks.map { it.value.first() }.joinToString("")
+//    }
 }
