@@ -6,22 +6,25 @@ import java.util.*
 class Dec05 : PuzzleDayTester(5, 2022) {
     private val distanceBetweenLetters = 4
 
-    override fun part1(): Any = loadData().let { (stacks, moves) ->
-        // move boxes
+    override fun part1(): Any = loadData().also { (stacks, moves) ->
         moveBoxes(moves, stacks)
-
-        //grab top from each stack
-        var output = ""
-        stacks.onEach { output += it.value.pop() }
-
-        return output
+    }.let { (stacks, _) ->
+        stacks.getFirstRow()
     }
 
-    override fun part2(): Any = loadData().let { (stacks, moves) ->
-        // move boxes
+    override fun part2(): Any = loadData().also { (stacks, moves) ->
+        moveBoxesPart2(moves, stacks)
+    }.let { (stacks, _) ->
+        stacks.getFirstRow()
+    }
+
+    private fun moveBoxesPart2(
+        moves: List<Move>,
+        stacks: MutableMap<Int, Stack<Char>>
+    ) {
         moves.forEach { move: Move ->
             val tmpList = mutableListOf<Char>()
-            for (i in 0 until move.count) {
+            repeat(move.count) {
                 stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()?.let {
                     tmpList.add(it)
                 }
@@ -32,13 +35,8 @@ class Dec05 : PuzzleDayTester(5, 2022) {
             }
 
         }
-
-        //grab top from each stack
-        var output = ""
-        stacks.onEach { output += it.value.pop() }
-
-        return output
     }
+
     private fun loadData(): Pair<MutableMap<Int, Stack<Char>>, List<Move>> {
         val input = load()
         val stacks = getInitialState(input)
@@ -52,7 +50,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         stacks: MutableMap<Int, Stack<Char>>
     ) {
         moves.forEach { move: Move ->
-            for (i in 0 until move.count) {
+            repeat(move.count) {
                 val popped = stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()
                 popped?.let { stacks[move.to]?.push(popped) }
             }
@@ -61,7 +59,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
 
     private fun getMovesList(input: List<String>): List<Move> {
         val indOfFirstMove = input.indexOf(input.first { it.contains("from") })
-        var moves: List<Move> = mutableListOf()
+        val moves: MutableList<Move> = mutableListOf()
 
         for (row in indOfFirstMove until input.size) {
             val reggy = "move (\\d{1,2}) from (\\d{1,2}) to (\\d{1,2})".toRegex()
@@ -97,5 +95,6 @@ class Dec05 : PuzzleDayTester(5, 2022) {
     }
 
     private fun MatchGroup?.toInt() = this?.value.toString().toInt()
+    private fun MutableMap<Int, Stack<Char>>.getFirstRow() = this.map { it.value.pop() }.joinToString("")
 
 }
