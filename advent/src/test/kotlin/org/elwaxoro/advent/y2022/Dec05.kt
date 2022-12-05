@@ -21,7 +21,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
             stacks[move[2]] = toMove.reversed().plus(destStack) // CrateMover 9000 drops crates in reverse order onto the new stack
         }
         stacks.map { it.value.first() }.joinToString("")
-    }
+    }// == "FWSHSPJWM"
 
     /**
      * Wait this isn't a CrateMover 9000 it's a CrateMover 9001
@@ -37,7 +37,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
             stacks[move[2]] = toMove.plus(destStack) // CrateMover 9001 drops crates in their original order
         }
         stacks.map { it.value.first() }.joinToString("")
-    }
+    }// == "PWPWHGFZS"
 
     /**
      * The award for most annoying parser goes to...
