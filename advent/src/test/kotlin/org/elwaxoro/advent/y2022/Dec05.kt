@@ -17,13 +17,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         val moves: List<Move> = getMovesList(indOfFirstMove, input)
 
         // move boxes
-        moves.forEachIndexed { ind, move: Move ->
-            println("moving ${move.count} from ${move.from} to ${move.to}")
-            for (i in 0 until move.count) {
-                val popped = stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()
-                popped?.let { stacks[move.to]?.push(popped) }
-            }
-        }
+        moveBoxes(moves, stacks)
 
 
         //grab top from each stack
@@ -31,6 +25,18 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         stacks.onEach { output += it.value.pop() }
 
         return output
+    }
+
+    private fun moveBoxes(
+        moves: List<Move>,
+        stacks: MutableMap<Int, Stack<Char>>
+    ) {
+        moves.forEachIndexed { ind, move: Move ->
+            for (i in 0 until move.count) {
+                val popped = stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()
+                popped?.let { stacks[move.to]?.push(popped) }
+            }
+        }
     }
 
     private fun getMovesList(indOfFirstMove: Int, input: List<String>): List<Move> {
