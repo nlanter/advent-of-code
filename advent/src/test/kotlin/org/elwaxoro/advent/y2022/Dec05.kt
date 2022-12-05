@@ -40,12 +40,12 @@ class Dec05 : PuzzleDayTester(5, 2022) {
 
         //parse the "stacks" section of input
         val parsedStacks = stacks.split("\n").map {
-            it.chunked(4).toMutableList() // mutable lists here so I can reuse rowColSwap
-        }.toMutableList().rowColSwap().map { swapped -> // vertical stacks are now rows, last in row is the stack number
-            // get rid of square braces, spaces, and empty slots
-            swapped.map { it.replace("[", "").replace("]", "").trim() }.filterNot { it.isBlank() }
+            it.chunked(4) // each stack is 4 characters wide
+        }.rowColSwap().map { stack -> // vertical stacks are now rows, last value in row is the stack name
+            // get rid of square braces, spaces, and empty garbage
+            stack.map { it.replace("[", "").replace("]", "").trim() }.filterNot { it.isBlank() }
         }.filter { it.isNotEmpty() }.associate {
-            // last item in list is the stack number, everything else is the stack contents
+            // last item in list is the stack name, everything else is the stack contents
             // first in stack list is the top item
             it.last() to it.dropLast(1)
         }.toMutableMap()
