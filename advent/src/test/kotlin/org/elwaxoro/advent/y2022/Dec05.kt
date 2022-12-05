@@ -6,12 +6,7 @@ import java.util.*
 class Dec05 : PuzzleDayTester(5, 2022) {
     private val distanceBetweenLetters = 4
 
-    override fun part1(): Any {
-        val input = load()
-        val stacks = getInitialState(input)
-
-        val moves: List<Move> = getMovesList(input)
-
+    override fun part1(): Any = loadData().let { (stacks, moves) ->
         // move boxes
         moveBoxes(moves, stacks)
 
@@ -20,6 +15,36 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         stacks.onEach { output += it.value.pop() }
 
         return output
+    }
+
+    override fun part2(): Any = loadData().let { (stacks, moves) ->
+        // move boxes
+        moves.forEach { move: Move ->
+            val tmpList = mutableListOf<Char>()
+            for (i in 0 until move.count) {
+                stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()?.let {
+                    tmpList.add(it)
+                }
+            }
+
+            tmpList.reversed().forEach {
+                stacks[move.to]?.push(it)
+            }
+
+        }
+
+        //grab top from each stack
+        var output = ""
+        stacks.onEach { output += it.value.pop() }
+
+        return output
+    }
+    private fun loadData(): Pair<MutableMap<Int, Stack<Char>>, List<Move>> {
+        val input = load()
+        val stacks = getInitialState(input)
+
+        val moves: List<Move> = getMovesList(input)
+        return Pair(stacks, moves)
     }
 
     private fun moveBoxes(
