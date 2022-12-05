@@ -6,17 +6,19 @@ import java.util.*
 class Dec05 : PuzzleDayTester(5, 2022) {
     private val distanceBetweenLetters = 4
 
-    override fun part1(): Any = loadData().also { (stacks, moves) ->
-        moveBoxes(moves, stacks)
-    }.let { (stacks, _) ->
-        stacks.getFirstRow()
-    }
+    override fun part1(): Any = loadData()
+        .also { (stacks, moves) ->
+            moveBoxes(moves, stacks)
+        }.let { (stacks, _) ->
+            stacks.getFirstRow()
+        }
 
-    override fun part2(): Any = loadData().also { (stacks, moves) ->
-        moveBoxesPart2(moves, stacks)
-    }.let { (stacks, _) ->
-        stacks.getFirstRow()
-    }
+    override fun part2(): Any = loadData()
+        .also { (stacks, moves) ->
+            moveBoxesPart2(moves, stacks)
+        }.let { (stacks, _) ->
+            stacks.getFirstRow()
+        }
 
     private fun moveBoxesPart2(
         moves: List<Move>,
