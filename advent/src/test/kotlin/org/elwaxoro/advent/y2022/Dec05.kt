@@ -37,7 +37,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
     private fun getMovesList(input: List<String>): List<Move> {
         val indOfFirstMove = input.indexOf(input.first { it.contains("from") })
         var moves: List<Move> = mutableListOf()
-        
+
         for (row in indOfFirstMove until input.size) {
             val reggy = "move (\\d{1,2}) from (\\d{1,2}) to (\\d{1,2})".toRegex()
             val matcher = reggy.matchEntire(input[row])
@@ -49,9 +49,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         return moves
     }
 
-    data class Move(val count: Int, val from: Int, val to: Int) {
-
-    }
+    data class Move(val count: Int, val from: Int, val to: Int) {}
 
     private fun getInitialState(input: List<String>): MutableMap<Int, Stack<Char>> {
         val rowContainingColumnNumbers = input.first { it[1].isDigit() }
