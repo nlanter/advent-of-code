@@ -59,15 +59,15 @@ class Dec02 : PuzzleDayTester(2, 2022) {
         var myScore = 0
 
         load().forEach {
-            val (opp, winLoseOrDraw) = it.split(" ")
+            val (opponentsPlay, winLoseOrDraw) = it.split(" ")
                 .let { plays -> RPSV2.fromString(plays[0]) to WinLoseOrDraw.fromString(plays[1]) }
 
-            val score = getMyPlay(winLoseOrDraw, opp).playScore + winLoseOrDraw.playScore
+            val score = getMyPlay(winLoseOrDraw, opponentsPlay).playScore + winLoseOrDraw.playScore
             println(
-                "enemy played $opp, i played ${
+                "enemy played $opponentsPlay, i played ${
                     getMyPlay(
                         winLoseOrDraw,
-                        opp
+                        opponentsPlay
                     )
                 } and $winLoseOrDraw with a score of $score"
             )
@@ -77,11 +77,11 @@ class Dec02 : PuzzleDayTester(2, 2022) {
         return myScore
     }
 
-    private fun getMyPlay(winLoseOrDraw: WinLoseOrDraw, rps: RPSV2): RPSV2 {
+    private fun getMyPlay(winLoseOrDraw: WinLoseOrDraw, play: RPSV2): RPSV2 {
         return when (winLoseOrDraw) {
-            WinLoseOrDraw.WIN -> rps.losesTo()
-            WinLoseOrDraw.LOSE -> rps.beats()
-            else -> rps
+            WinLoseOrDraw.WIN -> play.losesTo()
+            WinLoseOrDraw.LOSE -> play.beats()
+            else -> play
         }
     }
 
