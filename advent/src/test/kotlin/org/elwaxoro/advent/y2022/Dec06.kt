@@ -10,12 +10,12 @@ class Dec06 : PuzzleDayTester(6, 2022) {
     /**
      * start-of-packet: first 4 unique chars in a row
      */
-    override fun part1(): Any = findPacket(4) == 1300
+    override fun part1(): Any = findPacket(4)// == 1300
 
     /**
      * start-of-message: first 14 unique chars in a row
      */
-    override fun part2(): Any = findPacket(14) == 3986
+    override fun part2(): Any = findPacket(14)// == 3986
 
     private fun findPacket(size: Int): Int = load().first().toList().let { input ->
         // could look forwards or backwards, decided to look backwards
