@@ -18,7 +18,7 @@ class Dec06 : PuzzleDayTester(6, 2022) {
     override fun part2(): Any = findPacket(14)// == 3986
 
     private fun findPacket(size: Int): Int = load().first().toList().let { input ->
-        // could look forwards or backwards, decided to look backwards
+        // could look forwards then add the size or backwards and add nothing
         (size..input.lastIndex).first { endIdx ->
             input.subList(endIdx - size, endIdx).distinct().size == size
         }
