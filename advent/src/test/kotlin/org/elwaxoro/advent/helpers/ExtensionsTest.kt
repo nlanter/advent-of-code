@@ -1,6 +1,7 @@
 package org.elwaxoro.advent.helpers
 
 import org.elwaxoro.advent.permutations
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -8,7 +9,7 @@ class ExtensionsTest {
 
     @Test
     fun testPermutations() {
-        val abc = listOf('A', 'B', 'C').permutations()
+        val abc = listOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L').permutations()
         println(abc)
         assertEquals(6, abc.size)
 

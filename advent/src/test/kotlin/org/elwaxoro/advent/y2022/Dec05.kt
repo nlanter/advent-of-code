@@ -1,77 +1,102 @@
 package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.PuzzleDayTester
-import org.elwaxoro.advent.rowColSwap
-import org.elwaxoro.advent.takeSplit
+import java.util.*
 
-/**
- * Day 5: Supply Stacks
- */
 class Dec05 : PuzzleDayTester(5, 2022) {
+    private val distanceBetweenLetters = 4
 
-    /**
-     * Presumably, a CrateMover 9000
-     */
-    override fun part1(): Any = loader().let { (stacks, moves) ->
-        crateMover(stacks, moves, true)
-    } == "FWSHSPJWM"
+    override fun part1(): Any = loadData()
+        .also { (stacks, moves) ->
+            moveBoxes(moves, stacks)
+        }.let { (stacks, _) ->
+            stacks.getFirstRow()
+        }
 
-    /**
-     * Wait this isn't a CrateMover 9000 it's a CrateMover 9001
-     * OH SHIT
-     */
-    override fun part2(): Any = loader().let { (stacks, moves) ->
-        crateMover(stacks, moves, false)
-    } == "PWPWHGFZS"
+    override fun part2(): Any = loadData()
+        .also { (stacks, moves) ->
+            moveBoxesPart2(moves, stacks)
+        }.let { (stacks, _) ->
+            stacks.getFirstRow()
+        }
 
-    private fun crateMover(stacks: MutableMap<String, List<String>>, moves: List<List<String>>, isReversed: Boolean): String =
-        stacks.also {
-            moves.forEach { move ->
-                stacks[move[1]]!!.takeSplit(move[0].toInt()).let { (toMove, toKeep) ->
-                    stacks[move[1]] = toKeep
-                    stacks[move[2]] = (toMove.takeUnless { isReversed } ?: toMove.reversed()).plus(stacks[move[2]]!!)
+    private fun moveBoxesPart2(
+        moves: List<Move>,
+        stacks: MutableMap<Int, Stack<Char>>
+    ) {
+        moves.forEach { move: Move ->
+            val tmpList = mutableListOf<Char>()
+            repeat(move.count) {
+                stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()?.let {
+                    tmpList.add(it)
                 }
             }
-        }.map { it.value.first() }.joinToString("")
 
-    /**
-     * The award for most annoying parser goes to...
-     */
-    private fun loader() = load(delimiter = "\n\n").let { (stacks, moves) ->
+            tmpList.reversed().forEach {
+                stacks[move.to]?.push(it)
+            }
 
-        //parse the "stacks" section of input
-        val parsedStacks = stacks.split("\n").map {
-            it.chunked(4) // each stack is 4 characters wide
-        }.rowColSwap().map { stack -> // vertical stacks are now rows, last value in row is the stack name
-            // get rid of square braces, spaces, and empty garbage
-            stack.map { it.replace("[", "").replace("]", "").trim() }.filterNot { it.isBlank() }
-        }.filter { it.isNotEmpty() }.associate {
-            // last item in list is the stack name, everything else is the stack contents
-            // first in stack list is the top item
-            it.last() to it.dropLast(1)
-        }.toMutableMap()
-
-        // parse the "instructions" section of input
-        val parsedMoves = moves.split("\n").map { line ->
-            // get rid of all the text, then split on whitespace
-            line.replace("move ", "").replace("from ", "").replace("to ", "").split(" ")
         }
-        parsedStacks to parsedMoves
     }
 
+    private fun loadData(): Pair<MutableMap<Int, Stack<Char>>, List<Move>> {
+        val input = load()
+        val stacks = getInitialState(input)
 
-//    private fun crateMover(stacks: MutableMap<String, List<String>>, moves: List<List<String>>, isReversed: Boolean): String {
-//        moves.forEach { move ->
-//            val sourceStack = stacks[move[1]]!!
-//            val destStack = stacks[move[2]]!!
-//            val copyCount = move[0].toInt()
-//            var toMove = sourceStack.take(copyCount)
-//            if (isReversed) { // CrateMover 9001 drops crates in their original order
-//                toMove = toMove.reversed()
-//            }
-//            stacks[move[1]] = sourceStack.drop(copyCount)
-//            stacks[move[2]] = toMove.plus(destStack)
-//        }
-//        return stacks.map { it.value.first() }.joinToString("")
-//    }
+        val moves: List<Move> = getMovesList(input)
+        return Pair(stacks, moves)
+    }
+
+    private fun moveBoxes(
+        moves: List<Move>,
+        stacks: MutableMap<Int, Stack<Char>>
+    ) {
+        moves.forEach { move: Move ->
+            repeat(move.count) {
+                val popped = stacks[move.from]?.takeIf { it.isNotEmpty() }?.pop()
+                popped?.let { stacks[move.to]?.push(popped) }
+            }
+        }
+    }
+
+    private fun getMovesList(input: List<String>): List<Move> {
+        val indOfFirstMove = input.indexOf(input.first { it.contains("from") })
+        val moves: MutableList<Move> = mutableListOf()
+
+        for (row in indOfFirstMove until input.size) {
+            val reggy = "move (\\d{1,2}) from (\\d{1,2}) to (\\d{1,2})".toRegex()
+            val matcher = reggy.matchEntire(input[row])
+            matcher?.let {
+                moves += Move(count = it.groups[1].toInt(), from = it.groups[2].toInt(), to = it.groups[3].toInt())
+            }
+        }
+
+        return moves
+    }
+
+    data class Move(val count: Int, val from: Int, val to: Int) {}
+
+    private fun getInitialState(input: List<String>): MutableMap<Int, Stack<Char>> {
+        val rowContainingColumnNumbers = input.first { it[1].isDigit() }
+        val initialState = input.take(input.indexOf(rowContainingColumnNumbers))
+        val stackMap = mutableMapOf<Int, Stack<Char>>()
+
+        // populate initial stacks
+        for (rowInd in initialState.size - 1 downTo 0) {
+            for (colInd in 1..initialState[0].length step distanceBetweenLetters) {
+                initialState[rowInd][colInd].takeIf { it.isLetter() }?.also {
+                    val currentStack = stackMap[(colInd / distanceBetweenLetters) + 1]
+                    if (null == currentStack) stackMap[(colInd / distanceBetweenLetters) + 1] = Stack()
+                    stackMap[(colInd / distanceBetweenLetters) + 1]?.push(it)
+                }
+            }
+        }
+
+
+        return stackMap
+    }
+
+    private fun MatchGroup?.toInt() = this?.value.toString().toInt()
+    private fun MutableMap<Int, Stack<Char>>.getFirstRow() = this.map { it.value.pop() }.joinToString("")
+
 }

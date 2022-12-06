@@ -1,70 +1,129 @@
 package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.PuzzleDayTester
-import java.lang.IllegalStateException
 
-/**
- * Day 2: Rock Paper Scissors
- */
 class Dec02 : PuzzleDayTester(2, 2022) {
 
-    /**
-     * Parse to RPS on both sides, then play as last against first
-     */
-    override fun part1(): Any = load().map { it.split(" ").map { it.parseRPS() } }.sumOf { it.last().play(it.first()) }// == 10718
+    override fun part1(): Any {
+        var opponentScore = 0
+        var myScore = 0
 
-    /**
-     * Parse first to RPS, leave last alone, play as whatever RPS is appropriate for the desired outcome
-     */
-    override fun part2(): Any = load().map {
-        it.split(" ").let { it.first().parseRPS() to it.last() }
-    }.sumOf { (them, us) ->
-        when (us) {
-            "X" -> them.wins().play(them) // we need to lose
-            "Y" -> them.play(them) // we need to tie
-            "Z" -> them.loses().play(them) // we need to win
-            else -> throw IllegalStateException("I can't believe you've done this to $us")
+        load().forEach {
+            val (opp, me) = it.split(" ").let { plays -> RPS.fromString(plays[0]) to RPS.fromString(plays[1]) }
+            when {
+                opp.beats(me) -> opponentScore += winningScore
+                me.beats(opp) -> myScore += winningScore
+                else -> {
+                    opponentScore += drawScore; myScore += drawScore
+                }
+            }
+
+            opponentScore += opp.playScore
+            myScore += me.playScore
         }
-    }// == 14652
 
-    /**
-     * Why an enum? Not really sure :shrug:
-     * It didn't buy me much
-     */
-    private enum class RPS(val baseScore: Int) {
-        ROCK(1),
-        PAPER(2),
-        SCISSORS(3);
-
-        fun play(that: RPS): Int =
-            when (that) {
-                wins() -> 6 // this wins
-                this -> 3 // this ties
-                else -> 0 // this loses
-            } + baseScore
-
-        fun wins(): RPS =
-            when (this) {
-                ROCK -> SCISSORS
-                PAPER -> ROCK
-                SCISSORS -> PAPER
-            }
-
-        fun loses(): RPS =
-            when (this) {
-                ROCK -> PAPER
-                PAPER -> SCISSORS
-                SCISSORS -> ROCK
-            }
+        return myScore
     }
 
-    private fun String.parseRPS(): RPS = when (this) {
-        "A" -> RPS.ROCK
-        "B" -> RPS.PAPER
-        "C" -> RPS.SCISSORS
-        "X" -> RPS.ROCK
-        "Y" -> RPS.PAPER
-        "Z" -> RPS.SCISSORS
-        else -> throw IllegalStateException("Can't parse $this into RPS")
+    enum class RPS(private val opponentPlay: String, private val myPlay: String, val playScore: Int) {
+        ROCK("A", "X", 1),
+        PAPER("B", "Y", 2),
+        SCISSORS("C", "Z", 3),
+        IGNORED("", "", 0);
+
+        fun beats(other: RPS): Boolean {
+            return when {
+                this == ROCK && other == PAPER -> false
+                this == ROCK && other == SCISSORS -> true
+                this == PAPER && other == ROCK -> true
+                this == PAPER && other == SCISSORS -> false
+                this == SCISSORS && other == ROCK -> false
+                this == SCISSORS && other == PAPER -> true
+                else -> false
+            }
+        }
+
+        companion object {
+            fun fromString(str: String): RPS {
+                return RPS.values().firstOrNull { it.opponentPlay == str || it.myPlay == str } ?: IGNORED
+            }
+        }
     }
+
+    companion object {
+        const val winningScore = 6
+        const val drawScore = 3
+    }
+
+    override fun part2(): Any {
+        var myScore = 0
+
+        load().forEach {
+            val (opponentsPlay, winLoseOrDraw) = it.split(" ")
+                .let { plays -> RPSV2.fromString(plays[0]) to WinLoseOrDraw.fromString(plays[1]) }
+
+            val score = getMyPlay(winLoseOrDraw, opponentsPlay).playScore + winLoseOrDraw.playScore
+            println(
+                "enemy played $opponentsPlay, i played ${
+                    getMyPlay(
+                        winLoseOrDraw,
+                        opponentsPlay
+                    )
+                } and $winLoseOrDraw with a score of $score"
+            )
+            myScore += score
+        }
+
+        return myScore
+    }
+
+    private fun getMyPlay(winLoseOrDraw: WinLoseOrDraw, play: RPSV2): RPSV2 {
+        return when (winLoseOrDraw) {
+            WinLoseOrDraw.WIN -> play.losesTo()
+            WinLoseOrDraw.LOSE -> play.beats()
+            else -> play
+        }
+    }
+
+    enum class RPSV2(private val opponentPlay: String, val playScore: Int) {
+        ROCK("A", 1) {
+            override fun beats(): RPSV2 = SCISSORS
+            override fun losesTo(): RPSV2 = PAPER
+        },
+        PAPER("B", 2) {
+            override fun beats(): RPSV2 = ROCK
+            override fun losesTo(): RPSV2 = SCISSORS
+        },
+        SCISSORS("C", 3) {
+            override fun beats(): RPSV2 = PAPER
+            override fun losesTo(): RPSV2 = ROCK
+        },
+        IGNORED("", 0) {
+            override fun beats(): RPSV2 = IGNORED
+            override fun losesTo(): RPSV2 = IGNORED
+        };
+
+        abstract fun beats(): RPSV2
+        abstract fun losesTo(): RPSV2
+
+        companion object {
+            fun fromString(str: String): RPSV2 {
+                return RPSV2.values().firstOrNull { it.opponentPlay == str } ?: IGNORED
+            }
+        }
+    }
+
+    enum class WinLoseOrDraw(private val str: String, val playScore: Int) {
+        WIN("Z", 6),
+        LOSE("X", 0),
+        DRAW("Y", 3),
+        IGNORED("", 0);
+
+        companion object {
+            fun fromString(str: String): WinLoseOrDraw {
+                return WinLoseOrDraw.values().firstOrNull { it.str == str } ?: IGNORED
+            }
+        }
+    }
+
 }

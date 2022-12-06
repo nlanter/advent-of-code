@@ -1,4 +1,4 @@
-package org.elwaxoro.advent.y2022
+package org.elwaxoro.advent.emeryy2022
 
 import org.elwaxoro.advent.PuzzleDayTester
 

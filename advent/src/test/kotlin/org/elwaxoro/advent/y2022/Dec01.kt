@@ -2,14 +2,19 @@ package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.PuzzleDayTester
 
-/**
- * Day 1: Calorie Counting
- */
 class Dec01: PuzzleDayTester(1, 2022) {
 
-    override fun part1(): Any = loader().last()// == 70374
+    override fun part1(): Any = load(delimiter = "\n\n")
+        .map { elfValues ->  elfValues.split("\n")
+        .map { calories -> calories.toInt() } }
+        .maxOf { it.sum() }
 
-    override fun part2(): Any = loader().takeLast(3).sum()// == 204610
+    override fun part2(): Any = load(delimiter = "\n\n").asSequence() //204639
+        .map { elfValues ->  elfValues.split("\n")
+        .map { calories -> calories.toInt() } }
+        .map { it.sum() }
+        .sortedByDescending { it }
+        .take(3)
+        .sum()
 
-    private fun loader(): List<Int> = load(delimiter = "\n\n").map { it.split("\n").sumOf(String::toInt) }.sorted()
 }
