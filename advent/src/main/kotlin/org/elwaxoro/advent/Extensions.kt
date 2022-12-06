@@ -37,6 +37,12 @@ fun IntProgression.padTo(newSize: Int): List<Int> = toList().padTo(newSize)
 fun <T> List<T>.padTo(newSize: Int): List<T> = takeIf { size >= newSize } ?: plus(List(newSize - size) { last() })
 
 /**
+ * Splits a list into two, one with the first N elements the other with the remainder of the original list
+ * I wanted something like partition or windowed, except with the first part having a fixed size and the second part being the entire remainder
+ */
+fun <T> List<T>.takeSplit(n: Int): Pair<List<T>, List<T>> = take(n) to drop(n)
+
+/**
  * Get the median from a list of Int
  */
 fun List<Int>.median(): Double = sorted().let {
@@ -58,3 +64,21 @@ fun <T, U> List<Map<T, U>>.merge(merger: (value: U, existing: U?) -> U): Map<T, 
         }
     }
 }
+
+/**
+ * Generates all possible permutations of the provided list
+ * Should be "in-order" depending on your definition of "in-order" when it comes to permutations
+ * It's in some sort of order, anyway
+ * Ex: [A, B, C] becomes [[A, B, C], [A, C, B], [B, A, C], [B, C, A], [C, A, B], [C, B, A]]
+ *
+ * NOTE: this will only work on lists up to size 8 or so without running the jvm out of memory, so I guess if you really need to go that hard, give it more RAMs
+ * 8: 40,320 combos
+ * 9: 362,880 combos
+ * 10: 3,628,800 combos
+ */
+fun <T> List<T>.permutations(): List<List<T>> =
+    (0..lastIndex).fold(listOf(listOf<T>() to this)) { acc, _ ->
+        acc.flatMap { (permutation, candidates) ->
+            candidates.map { permutation.plus(it) to candidates.minus(it) }
+        }
+    }.map { it.first }
