@@ -1,6 +1,7 @@
 package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.PuzzleDayTester
+import org.elwaxoro.advent.toInt
 import java.util.*
 
 class Dec05 : PuzzleDayTester(5, 2022) {
@@ -96,7 +97,6 @@ class Dec05 : PuzzleDayTester(5, 2022) {
         return stackMap
     }
 
-    private fun MatchGroup?.toInt() = this?.value.toString().toInt()
     private fun MutableMap<Int, Stack<Char>>.getFirstRow() = this.map { it.value.pop() }.joinToString("")
 
 }

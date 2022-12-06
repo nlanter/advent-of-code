@@ -82,3 +82,6 @@ fun <T> List<T>.permutations(): List<List<T>> =
             candidates.map { permutation.plus(it) to candidates.minus(it) }
         }
     }.map { it.first }
+
+
+fun MatchGroup?.toInt() = this?.value.toString().toInt()
