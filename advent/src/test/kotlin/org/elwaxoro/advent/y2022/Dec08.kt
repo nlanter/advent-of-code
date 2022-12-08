@@ -20,6 +20,23 @@ class Dec08 : PuzzleDayTester(8, 2022) {
         return visibleCount
     }
 
+    override fun part2(): Any {
+        val grid = loadTreesIntoGrid()
+
+        var maxVisibleCount = 0
+        grid.forEachIndexed { rowIdx, row ->
+            row.forEachIndexed { colIdx, _ ->
+                val visibility = searchLeftV2(grid, rowIdx, colIdx) * searchRightV2(grid, rowIdx, colIdx) * searchUpV2(
+                    grid,
+                    rowIdx,
+                    colIdx
+                ) * searchDownV2(grid, rowIdx, colIdx)
+                if (visibility > maxVisibleCount) maxVisibleCount = visibility
+            }
+        }
+        return maxVisibleCount
+    }
+
     private fun searchLeft(grid: Array<IntArray>, rowIdx: Int, colIdx: Int): Boolean {
         var colIdxMutable = colIdx
         while (colIdxMutable > 0) {
@@ -74,5 +91,61 @@ class Dec08 : PuzzleDayTester(8, 2022) {
 //            println(row.contentToString())
 //        }
 //    }
+
+
+
+    private fun searchLeftV2(grid: Array<IntArray>, rowIdx: Int, colIdx: Int): Int {
+        var colIdxMutable = colIdx
+        var viewingDistance = 0
+        while (colIdxMutable > 0) {
+            if (grid[rowIdx][colIdxMutable - 1] >= grid[rowIdx][colIdx]) {
+                return viewingDistance + 1
+            }
+            colIdxMutable--
+            viewingDistance++
+        }
+        return viewingDistance
+    }
+    private fun searchRightV2(grid: Array<IntArray>, rowIdx: Int, colIdx: Int): Int {
+        var colIdxMutable = colIdx
+        var viewingDistance = 0
+        while (colIdxMutable < grid[rowIdx].size - 1) {
+            if (grid[rowIdx][colIdxMutable + 1] >= grid[rowIdx][colIdx]) {
+                return viewingDistance + 1
+            }
+            colIdxMutable++
+            viewingDistance++
+        }
+        return viewingDistance
+    }
+
+    private fun searchUpV2(grid: Array<IntArray>, rowIdx: Int, colIdx: Int): Int {
+        var rowIdxMutable = rowIdx
+        var viewingDistance = 0
+
+        while (rowIdxMutable > 0) {
+            if (grid[rowIdxMutable - 1][colIdx] >= grid[rowIdx][colIdx]) {
+                return viewingDistance + 1
+            }
+            rowIdxMutable--
+            viewingDistance++
+        }
+        return viewingDistance
+    }
+
+    private fun searchDownV2(grid: Array<IntArray>, rowIdx: Int, colIdx: Int): Int {
+        var rowIdxMutable = rowIdx
+        var viewingDistance = 0
+
+        while (rowIdxMutable < grid.size - 1) {
+            if (grid[rowIdxMutable + 1][colIdx] >= grid[rowIdx][colIdx]) {
+                return viewingDistance + 1
+            }
+            rowIdxMutable++
+            viewingDistance++
+        }
+        return viewingDistance
+    }
+
 
 }
