@@ -7,7 +7,7 @@ class Dec10 : PuzzleDayTester(10, 2022) {
 
     override fun part1(): Any {
         val instr = loadInstructions()
-        var counter = 1
+        var cycle = 1
         var register = 1
         var strength = 0
         val remainingCycles = Stack <Pair<Instruction, Int?>>()
@@ -15,36 +15,30 @@ class Dec10 : PuzzleDayTester(10, 2022) {
         while (instr.isNotEmpty() || remainingCycles.isNotEmpty()) {
             val currInstr = if(instr.isNotEmpty()) instr.pop() else null
 
-
-            if(remainingCycles.isNotEmpty()) {
-                val ins = remainingCycles.pop()
-                println("Executing instruction $ins")
-                register += ins.second ?: 0
+            if (remainingCycles.isNotEmpty()) {
+                register += remainingCycles.pop().second ?: 0
             }
-            println("cycle $counter, register $register, currInstr $currInstr")
+            println("cycle $cycle, register $register, currInstr $currInstr")
 
-            when {
-                counter == 20 -> strength += register * 20
-//                (counter - 20 % 40 == 0) -> strength += register * counter - 20
-                counter == 60 -> strength += register * 60
-                counter == 100 -> strength += register * 100
-                counter == 140 -> strength += register * 140
-                counter == 180 -> strength += register * 180
-                counter == 220 -> strength += register * 220
-
-            }
-            if (counter % 20 == 0) {
-                println("strength now $strength at cycle $counter")
-            }
+            strength += checkStrength(cycle, register)
 
             if (currInstr?.first != Instruction.NOOP) {
                 remainingCycles.push(currInstr)
-                counter++
+                println("detected ${currInstr?.first}, skipping cycle ${cycle + 1}")
+                cycle++
+                strength += checkStrength(cycle, register)
             }
-            counter++
+            cycle++
         }
 
         return "register: $register, strength: $strength"
+    }
+
+    private fun checkStrength(cycle: Int, register: Int): Int {
+        return when {
+            (cycle - 20) % 40 == 0 ->  register * cycle
+            else -> 0
+        }
     }
 
 
