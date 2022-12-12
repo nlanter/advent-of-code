@@ -18,16 +18,15 @@ class Dec10 : PuzzleDayTester(10, 2022) {
             if (remainingCycles.isNotEmpty()) {
                 register += remainingCycles.pop().second ?: 0
             }
-            println("cycle $cycle, register $register, currInstr $currInstr")
-
-            strength += checkStrength(cycle, register)
+//            println("cycle $cycle, register $register, currInstr $currInstr")
 
             if (currInstr?.first != Instruction.NOOP) {
                 remainingCycles.push(currInstr)
-                println("detected ${currInstr?.first}, skipping cycle ${cycle + 1}")
+//                println("detected ${currInstr?.first}, skipping cycle ${cycle + 1}")
                 cycle++
-                strength += checkStrength(cycle, register)
             }
+
+            strength += checkStrength(cycle, register)
             cycle++
         }
 
