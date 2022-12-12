@@ -39,11 +39,6 @@ class Dec08 : PuzzleDayTester(8, 2022) {
         }
         grid
     }
-//    .also {
-//        for (row in it) {
-//            println(row.contentToString())
-//        }
-//    }
 
 
 

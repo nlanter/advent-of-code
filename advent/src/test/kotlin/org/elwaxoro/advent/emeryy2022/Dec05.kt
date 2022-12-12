@@ -37,7 +37,7 @@ class Dec05 : PuzzleDayTester(5, 2022) {
     /**
      * The award for most annoying parser goes to...
      */
-    private fun loader() = load(delimiter = "\n\n").let { (stacks, moves) ->
+    private fun     loader() = load(delimiter = "\n\n").let { (stacks, moves) ->
 
         //parse the "stacks" section of input
         val parsedStacks = stacks.split("\n").map {
