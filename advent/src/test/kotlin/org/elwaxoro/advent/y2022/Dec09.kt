@@ -11,15 +11,15 @@ class Dec09 : PuzzleDayTester(9, 2022) {
         val moves = getMoves()
 
         val head = Node()
-        val prevHeadC = Node()
+        val prevHead = Node()
         val tail = Node()
         moves.onEach { (dir, count) ->
             repeat(count) {
-                prevHeadC.moveTo(head)
+                prevHead.moveTo(head)
                 head.moveTo(dir)
 
                 if (tail.isTailNotTouchingHead(head)) {
-                    tail.moveTo(prevHeadC)
+                    tail.moveTo(prevHead)
                 }
                 tail.trackPosition()
             }
