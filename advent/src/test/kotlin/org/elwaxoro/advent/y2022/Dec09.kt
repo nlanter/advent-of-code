@@ -10,28 +10,37 @@ class Dec09 : PuzzleDayTester(9, 2022) {
     override fun part1(): Any {
         val moves = getMoves()
 
-        var head = Coord(0, 0)
-        var prevHead = Coord(0, 0)
-        var tail = Coord(0, 0)
-        val tailPositions = mutableSetOf<Coord>()
+        val head = Node()
+        val prevHeadC = Node()
+        val tail = Node()
         moves.onEach { (dir, count) ->
             repeat(count) {
-                prevHead = head
-                head = head.move(dir)
+                prevHeadC.moveTo(head)
+                head.moveTo(dir)
 
-                if (tail.neighbors9().none { it.contains(head) }) {
-                    tail = prevHead
+                if (tail.isTailNotTouchingHead(head)) {
+                    tail.moveTo(prevHeadC)
                 }
-                tailPositions.add(Coord(tail.x, tail.y))
+                tail.trackPosition()
             }
 
         }
 
 
-        println(tailPositions.printify(invert = true))
-        return tailPositions.size
+        println(tail.positions.printify(invert = true))
+        return tail.positions.size
     }
 
+    class Node(var currCoord: Coord = Coord(0, 0), val positions: MutableSet<Coord> = mutableSetOf(currCoord)) {
+        fun moveTo(next: Node) {
+            currCoord = next.currCoord
+        }
+
+        fun trackPosition() = positions.add(Coord(currCoord.x, currCoord.y))
+        fun isTailNotTouchingHead(head: Node) = currCoord.neighbors9().none { it.contains(head.currCoord) }
+
+        fun moveTo(dir: Dir) { currCoord = currCoord.move(dir) }
+    }
 
     private fun getMoves() = load().map { it.split(" ").let { Dir.fromUDLR(it[0].first()) to it[1].toInt() } }
 
