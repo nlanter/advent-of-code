@@ -11,23 +11,24 @@ class Dec09 : PuzzleDayTester(9, 2022) {
         val moves = getMoves()
 
         var head = Coord(0, 0)
+        var prevHead = Coord(0, 0)
         var tail = Coord(0, 0)
-        var tailPositions = mutableSetOf<Coord>()
+        val tailPositions = mutableSetOf<Coord>()
         moves.onEach { (dir, count) ->
             repeat(count) {
+                prevHead = head
                 head = head.move(dir)
 
-//                tail = moveTail(tail, head)
                 if (tail.neighbors9().none { it.contains(head) }) {
-                    tailPositions.add(Coord(tail.x, tail.y))
-                    tail = head
+                    tail = prevHead
                 }
+                tailPositions.add(Coord(tail.x, tail.y))
             }
 
         }
 
-        println(tailPositions.printify(invert = true))
 
+        println(tailPositions.printify(invert = true))
         return tailPositions.size
     }
 

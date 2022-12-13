@@ -6,14 +6,14 @@ import java.util.*
 class Dec10 : PuzzleDayTester(10, 2022) {
 
     override fun part1(): Any {
-        val instr = loadInstructions()
+        val instrs = loadInstructions()
         var cycle = 1
         var register = 1
         var strength = 0
         val remainingCycles = Stack <Pair<Instruction, Int?>>()
 
-        while (instr.isNotEmpty() || remainingCycles.isNotEmpty()) {
-            val currInstr = if(instr.isNotEmpty()) instr.pop() else null
+        while (instrs.isNotEmpty() || remainingCycles.isNotEmpty()) {
+            val currInstr = if (instrs.isNotEmpty()) instrs.pop() else null
 
             if (remainingCycles.isNotEmpty()) {
                 register += remainingCycles.pop().second ?: 0
