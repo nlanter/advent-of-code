@@ -9,37 +9,42 @@ class Dec09 : PuzzleDayTester(9, 2022) {
 
     override fun part1(): Any {
         val moves = getMoves()
-
-        val head = Node()
-        val prevHead = Node()
-        val tail = Node()
+        val tails = mutableListOf<Node>().apply { repeat(10) {add(Node())} }
         moves.onEach { (dir, count) ->
             repeat(count) {
-                prevHead.moveTo(head)
-                head.moveTo(dir)
-
-                if (tail.isTailNotTouchingHead(head)) {
-                    tail.moveTo(prevHead)
+                tails.onEachIndexed { idx, currTail ->
+                    if (idx > 0) {
+                        val currHead = tails[idx - 1]
+                        if (currTail.isTailNotTouchingHead(currHead)) {
+                            currTail.moveTo(currHead)
+                            if(idx == tails.size - 1) {println("moving tail ${currTail.currCoord} on $dir $count") }
+                        }
+                        currTail.trackPosition()
+                    } else {
+                        tails[idx].moveTo(dir)
+                        println("moving head ${currTail.currCoord} on $dir $count")
+                    }
                 }
-                tail.trackPosition()
             }
+            println(tails.last().positions.printify(invert = true))
 
         }
 
 
-        println(tail.positions.printify(invert = true))
-        return tail.positions.size
+        println(tails.last().positions.printify(invert = true))
+        return tails.last().positions.size
     }
 
-    class Node(var currCoord: Coord = Coord(0, 0), val positions: MutableSet<Coord> = mutableSetOf(currCoord)) {
+    class Node(var currCoord: Coord = Coord(0, 0), var prevCoord: Coord = currCoord, val positions: MutableSet<Coord> = mutableSetOf(currCoord)) {
         fun moveTo(next: Node) {
-            currCoord = next.currCoord
+            prevCoord = currCoord
+            currCoord = next.prevCoord
         }
 
         fun trackPosition() = positions.add(Coord(currCoord.x, currCoord.y))
         fun isTailNotTouchingHead(head: Node) = currCoord.neighbors9().none { it.contains(head.currCoord) }
 
-        fun moveTo(dir: Dir) { currCoord = currCoord.move(dir) }
+        fun moveTo(dir: Dir) { prevCoord = currCoord; currCoord = currCoord.move(dir) }
     }
 
     private fun getMoves() = load().map { it.split(" ").let { Dir.fromUDLR(it[0].first()) to it[1].toInt() } }
