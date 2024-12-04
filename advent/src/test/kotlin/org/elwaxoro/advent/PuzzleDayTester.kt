@@ -27,6 +27,8 @@ abstract class PuzzleDayTester(val day: Int, val year: Int) {
      */
     open fun load(testNum: Int? = null, delimiter: String = "\n"): List<String> = loadSplit(getPath(testNum), delimiter)
 
+    open fun loadToString(testNum: Int? = null): String = loadText(getPath(testNum))
+
     /**
      * Default loader, gets the input file and returns a list of integers
      */
