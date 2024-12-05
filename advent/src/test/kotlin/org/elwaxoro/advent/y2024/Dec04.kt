@@ -17,6 +17,28 @@ class Dec4: PuzzleDayTester(4, 2024)  {
         count
     }
 
+    override fun part2(): Any = load(testNum = 2).map { it.lowercase().toCharArray() }.let { map ->
+        var count = 0
+         map.onEachIndexed { rowIdx, row ->
+            row.onEachIndexed { colIdx, col ->
+                if (col.lowercaseChar() == 'a') {
+                    if ((
+                                (map.getOrNull(rowIdx - 1, colIdx - 1) == 'm' && map.getOrNull(rowIdx + 1, colIdx + 1) == 's') ||
+                                (map.getOrNull(rowIdx - 1, colIdx - 1) == 's' && map.getOrNull(rowIdx + 1, colIdx + 1) == 'm')
+                        ) &&
+                        (
+                                (map.getOrNull(rowIdx - 1, colIdx + 1) == 'm' && map.getOrNull(rowIdx + 1, colIdx - 1) == 's') ||
+                                (map.getOrNull(rowIdx - 1, colIdx + 1) == 's' && map.getOrNull(rowIdx + 1, colIdx - 1) == 'm')
+                        )
+                    ) {
+                        count++
+                    }
+                }
+            }
+        }
+        count
+    }
+
     private fun search(rowIdx: Int, colIdx: Int, map: List<CharArray>): Int {
         val depth = 1
 
