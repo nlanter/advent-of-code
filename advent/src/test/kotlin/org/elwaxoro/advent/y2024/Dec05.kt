@@ -9,6 +9,7 @@ class Dec5 : PuzzleDayTester(5, 2024) {
         it[it.size / 2]
     }
 
+    // 4030
     override fun part2(): Any {
         val rules = getRulesAndPages(testNum = 2).first
         return splitGoodAndBad(testNum = 2).second.map {
